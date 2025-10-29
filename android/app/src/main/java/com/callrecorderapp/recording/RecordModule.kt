@@ -68,9 +68,21 @@ class RecordModule(private val reactCtx: ReactApplicationContext) : ReactContext
     return File(base, "Recordings").apply { if (!exists()) mkdirs() }
   }
 
+  @ReactMethod
+  fun setRecordingTitle(title: String, promise: Promise) {
+    try {
+      // Store title for use in service
+      recordingTitle = title
+      promise.resolve(true)
+    } catch (t: Throwable) {
+      promise.reject("ERR_TITLE", t)
+    }
+  }
+
   companion object {
     const val PREFS = "callrec_prefs"
     const val KEY_AUTO_CALL = "auto_call_recording"
+    var recordingTitle: String = ""
     fun isAutoCallEnabled(ctx: Context): Boolean = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
       .getBoolean(KEY_AUTO_CALL, false)
   }

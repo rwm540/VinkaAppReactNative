@@ -88,8 +88,9 @@ class ForegroundRecordService : Service() {
     val baseDir = getExternalFilesDir(Environment.DIRECTORY_MUSIC) ?: filesDir
     val recDir = File(baseDir, "Recordings").apply { if (!exists()) mkdirs() }
     val ts = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+    val title = if (RecordModule.recordingTitle.isNotEmpty()) "_${RecordModule.recordingTitle}" else ""
     val prefix = if (type == TYPE_CALL) "CALL" else "VOICE"
-    return File(recDir, "${prefix}_${ts}.m4a")
+    return File(recDir, "${prefix}${title}_${ts}.m4a")
   }
 
   companion object {

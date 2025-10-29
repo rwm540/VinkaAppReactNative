@@ -10,6 +10,8 @@ import {
   NativeModules,
   Platform,
   Alert,
+  TextInput,
+  I18nManager,
 } from 'react-native';
 import {PERMISSIONS, RESULTS, requestMultiple} from 'react-native-permissions';
 import RNFS from 'react-native-fs';
@@ -28,6 +30,11 @@ function App(): React.JSX.Element {
     new NativeEventEmitter((NativeModules as any).AudioPlayerModule),
   );
   const [playingPath, setPlayingPath] = useState<string | null>(null);
+  const [recordingTitle, setRecordingTitle] = useState('');
+
+  useEffect(() => {
+    I18nManager.forceRTL(true);
+  }, []);
 
   const refreshList = useCallback(async () => {
     try {
@@ -82,11 +89,16 @@ function App(): React.JSX.Element {
   }, []);
 
   const onStart = useCallback(async () => {
+    if (!recordingTitle.trim()) {
+      Alert.alert('عنوان لازم است', 'لطفاً عنوان ضبط را وارد کنید.');
+      return;
+    }
     const ok = await ensurePermissions();
     if (!ok) {
       return;
     }
     try {
+      await RecordModule.setRecordingTitle(recordingTitle);
       await RecordModule.startVoiceRecording();
       setRecording(true);
       // Give it a moment then refresh list
@@ -94,7 +106,7 @@ function App(): React.JSX.Element {
     } catch (e: any) {
       Alert.alert('خطا در شروع ضبط', e?.message ?? String(e));
     }
-  }, [ensurePermissions, refreshList]);
+  }, [ensurePermissions, refreshList, recordingTitle]);
 
   const onStop = useCallback(async () => {
     try {
@@ -195,6 +207,13 @@ function App(): React.JSX.Element {
         <Text style={styles.desc}>
           تا زمانی که دکمه «پایان ضبط» را نزنید فعال می‌ماند.
         </Text>
+        <TextInput
+          style={styles.input}
+          placeholder="عنوان ضبط مکالمه را وارد کنید"
+          value={recordingTitle}
+          onChangeText={setRecordingTitle}
+          textAlign="right"
+        />
         <View style={styles.row}>
           <Button title="شروع ضبط" onPress={onStart} disabled={recording} />
           <View style={styles.gap12} />
@@ -297,6 +316,15 @@ const styles = StyleSheet.create({
   gap12: {width: 12},
   gap8: {width: 8},
   flex1: {flex: 1},
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
 });
 
 export default App;
