@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import {Alert, Platform} from 'react-native';
 import {
   check,
