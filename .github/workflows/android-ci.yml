@@ -42,8 +42,11 @@ jobs:
       - name: Build Debug APK
         run: cd android && ./gradlew assembleDebug -x lint
 
-      - name: Upload APK artifact
+      - name: Rename APK to Vinka.apk
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk Vinka.apk
+
+      - name: Upload APK artifact (Vinka.apk)
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: Vinka.apk
+          path: Vinka.apk

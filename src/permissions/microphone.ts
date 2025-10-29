@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {Alert, Platform} from 'react-native';
 import {
   check,
@@ -25,7 +26,7 @@ export async function ensureMicrophonePermission(): Promise<boolean> {
 
   switch (status) {
     case RESULTS.GRANTED:
-  return true;
+      return true;
     case RESULTS.DENIED: {
       const req = await request(perm);
       return req === RESULTS.GRANTED;
