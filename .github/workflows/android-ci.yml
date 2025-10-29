@@ -39,11 +39,11 @@ jobs:
       - name: Make Gradle executable
         run: chmod +x android/gradlew
 
-      - name: Build Debug APK
-        run: cd android && ./gradlew assembleDebug -x lint
+      - name: Build Release APK
+        run: cd android && ./gradlew assembleRelease -x lint
 
       - name: Upload APK artifact (Vinka.apk)
         uses: actions/upload-artifact@v4
         with:
           name: Vinka.apk
-          path: android/app/build/outputs/apk/debug/Vinka.apk
+          path: android/app/build/outputs/apk/release/Vinka.apk
