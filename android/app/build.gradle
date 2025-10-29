@@ -115,4 +115,13 @@ dependencies {
     }
 }
 
+// Rename debug APK output to Vinka.apk for local builds
+android.applicationVariants.all { variant ->
+    variant.outputs.each { output ->
+        if (variant.buildType.name == "debug") {
+            output.outputFileName = "Vinka.apk"
+        }
+    }
+}
+
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
