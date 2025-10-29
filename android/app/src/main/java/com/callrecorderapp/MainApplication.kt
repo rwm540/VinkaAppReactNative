@@ -19,6 +19,7 @@ class MainApplication : Application(), ReactApplication {
             PackageList(this).packages.apply {
               // Add our custom native module package
               add(com.callrecorderapp.recording.RecordPackage())
+              add(com.callrecorderapp.player.AudioPlayerPackage())
             }
 
         override fun getJSMainModuleName(): String = "index"

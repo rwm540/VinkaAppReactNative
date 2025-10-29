@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import {PERMISSIONS, RESULTS, requestMultiple} from 'react-native-permissions';
 import RNFS from 'react-native-fs';
-import Sound from 'react-native-sound';
+import {NativeEventEmitter} from 'react-native';
 
 const {RecordModule} = NativeModules as any;
 
@@ -24,7 +24,9 @@ function App(): React.JSX.Element {
   const [files, setFiles] = useState<
     Array<{name: string; path: string; mtime?: number}>
   >([]);
-  const playerRef = useRef<Sound | null>(null);
+  const playerEvents = useRef(
+    new NativeEventEmitter((NativeModules as any).AudioPlayerModule),
+  );
   const [playingPath, setPlayingPath] = useState<string | null>(null);
 
   const refreshList = useCallback(async () => {
@@ -134,36 +136,39 @@ function App(): React.JSX.Element {
     refreshList();
   }, [dirPath, refreshList]);
 
-  const stopPlayback = useCallback(() => {
+  const stopPlayback = useCallback(async () => {
     try {
-      playerRef.current?.stop();
-      playerRef.current?.release();
+      await (NativeModules as any).AudioPlayerModule.stop();
     } catch {}
-    playerRef.current = null;
     setPlayingPath(null);
   }, []);
 
   const togglePlay = useCallback(
-    (filePath: string) => {
+    async (filePath: string) => {
       if (playingPath === filePath) {
-        stopPlayback();
+        await stopPlayback();
         return;
       }
-      stopPlayback();
-      const s = new Sound(filePath, '', err => {
-        if (err) {
-          Alert.alert('پخش ناموفق', 'فایل قابل پخش نیست.');
-          return;
-        }
-        playerRef.current = s;
+      await stopPlayback();
+      try {
+        await (NativeModules as any).AudioPlayerModule.play(filePath);
         setPlayingPath(filePath);
-        s.play(() => {
-          stopPlayback();
-        });
-      });
+      } catch (e) {
+        Alert.alert('پخش ناموفق', 'فایل قابل پخش نیست.');
+      }
     },
     [playingPath, stopPlayback],
   );
+
+  useEffect(() => {
+    const sub = playerEvents.current.addListener(
+      'AudioPlayerOnComplete',
+      () => {
+        setPlayingPath(null);
+      },
+    );
+    return () => sub.remove();
+  }, []);
 
   const onDelete = useCallback(
     async (filePath: string) => {
