@@ -89,13 +89,15 @@ class ForegroundRecordService : Service() {
     val recDir = File(baseDir, "Recordings").apply { if (!exists()) mkdirs() }
     val ts = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
     val title = if (RecordModule.recordingTitle.isNotEmpty()) "_${RecordModule.recordingTitle}" else ""
+    val phone = intent?.getStringExtra(EXTRA_PHONE_NUMBER)?.let { "_$it" } ?: ""
     val prefix = if (type == TYPE_CALL) "CALL" else "VOICE"
-    return File(recDir, "${prefix}${title}_${ts}.m4a")
+    return File(recDir, "${prefix}${title}${phone}_${ts}.m4a")
   }
 
   companion object {
     const val NOTIF_ID = 1001
     const val EXTRA_TYPE = "type"
+    const val EXTRA_PHONE_NUMBER = "phone_number"
     const val TYPE_VOICE = "voice"
     const val TYPE_CALL = "call"
 

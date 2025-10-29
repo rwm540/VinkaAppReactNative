@@ -18,7 +18,10 @@ class PhoneStateReceiver : BroadcastReceiver() {
       }
       TelephonyManager.EXTRA_STATE_OFFHOOK -> {
         // Start recording as call is active
-        val i = ForegroundRecordService.intent(context, ForegroundRecordService.TYPE_CALL)
+        val phoneNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER) ?: "Unknown"
+        val i = ForegroundRecordService.intent(context, ForegroundRecordService.TYPE_CALL).apply {
+          putExtra(ForegroundRecordService.EXTRA_PHONE_NUMBER, phoneNumber)
+        }
         if (android.os.Build.VERSION.SDK_INT >= 26) context.startForegroundService(i) else context.startService(i)
       }
       TelephonyManager.EXTRA_STATE_IDLE -> {
