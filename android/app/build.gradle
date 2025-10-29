@@ -115,12 +115,10 @@ dependencies {
     }
 }
 
-// Rename debug APK output to Vinka.apk for local builds
+// Rename APK output to Vinka.apk for both debug and release builds
 android.applicationVariants.all { variant ->
     variant.outputs.each { output ->
-        if (variant.buildType.name == "debug") {
-            output.outputFileName = "Vinka.apk"
-        }
+        output.outputFileName = "Vinka.apk"
     }
 }
 
